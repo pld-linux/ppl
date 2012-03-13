@@ -1,6 +1,8 @@
 # TODO
 # - help naming the subpackages properly
 # - fix mess with docs packaging
+# - ciao_prolog, xsb prolog
+# - proprietary: cicstus prolog
 #
 # Conditional build:
 %bcond_with	java	# java bindings
@@ -18,17 +20,21 @@
 Summary:	The Parma Polyhedra Library: a library of numerical abstractions
 Summary(pl.UTF-8):	Parma Polyhedra Library - biblioteka abstrakcji matematycznych
 Name:		ppl
-Version:	0.11.2
+Version:	0.12
 Release:	1
 License:	GPL v3+
 Group:		Libraries
-Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.bz2
-# Source0-md5:	c24429e6c3bc97d45976a63f40f489a1
+Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.xz
+# Source0-md5:	7615f217b66b4ab4783c20c9fc516ff4
 URL:		http://www.cs.unipr.it/ppl/
 BuildRequires:	glpk-devel >= 4.13
 BuildRequires:	gmp-c++-devel >= 4.1.3
 BuildRequires:	gmp-devel >= 4.1.3
+BuildRequires:	libstdc++-devel
 BuildRequires:	m4 >= 1.4.8
+BuildRequires:	perl-base
+BuildRequires:	tar >= 1:1.22
+BuildRequires:	xz
 %if %{with yap_pl}
 BuildRequires:	yap-devel >= 5.1.1
 %endif
@@ -47,6 +53,7 @@ BuildRequires:	ocaml >= 3.09
 BuildRequires:	jdk
 BuildRequires:	jpackage-utils
 %endif
+Obsoletes:	ppl-pwl
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -82,6 +89,7 @@ Summary(pl.UTF-8):	Pliki programistyczne intefejsów C i C++ biblioteki PPL
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	gmp-devel >= 4.1.3
+Obsoletes:	ppl-pwl-devel
 
 %description devel
 The header files, Autoconf macro and minimal documentation for
@@ -98,6 +106,7 @@ Summary:	Static archives for the Parma Polyhedra Library C and C++ interfaces
 Summary(pl.UTF-8):	Biblioteki statyczne interfejsów C i C++ biblioteki PPL
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
+Obsoletes:	ppl-pwl-static
 
 %description static
 The static archives for the Parma Polyhedra Library C and C++
@@ -112,6 +121,7 @@ Summary:	Documentation for the Parma Polyhedra Library
 Summary(pl.UTF-8):	Dokumentacja biblioteki Parma Polyhedra Library
 Group:		Documentation
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	ppl-pwl-docs
 
 %description docs
 This package contains all the documentations required by programmers
@@ -122,69 +132,6 @@ want to program with the PPL.
 Ten pakiet zawiera całą dokumentację potrzebną programistom
 korzystającym z biblioteki Parma Polyhedra Library (PPL). Warto
 zainstalować ten pakiet, aby programować z użyciem PPL.
-
-%package pwl
-Summary:	The Parma Watchdog Library: a C++ library for watchdog timers
-Summary(pl.UTF-8):	Biblioteka Parma Watchdog Library: biblioteka C++ ze stoperami kontrolującymi
-Group:		Libraries
-
-%description pwl
-The Parma Watchdog Library (PWL) provides support for multiple,
-concurrent watchdog timers on systems providing setitimer(2). This
-package provides all what is necessary to run applications using the
-PWL. The PWL is currently distributed with the Parma Polyhedra
-Library, but is totally independent from it.
-
-%description pwl -l pl.UTF-8
-Biblioteka Parma Watchdog Library (PWL) zapewnia obsługę wielu
-jednocześnie działających stoperów na systemach z funkcją
-setitimer(2). Ten pakiet zawiera wszystko, co jest potrzebne do
-uruchamiania aplikacji wykorzystujących PWL. PWL jest rozprowadzana
-z biblioteką Parma Polyhedra Library, ale jest od niej całkowicie
-niezależna.
-
-%package pwl-devel
-Summary:	Development files for the Parma Watchdog Library
-Summary(pl.UTF-8):	Pliki programistyczne biblioteki Parma Watchdog Library
-Group:		Development/Libraries
-Requires:	%{name}-pwl = %{version}-%{release}
-
-%description pwl-devel
-The header files and minimal documentation for developing applications
-using the Parma Watchdog Library.
-
-%description pwl-devel -l pl.UTF-8
-Pliki nagłówkowe i minimalna dokumentacja do tworzenia aplikacji
-wykorzystujących bibliotekę Parma Watchdog Library.
-
-%package pwl-static
-Summary:	Static archive for the Parma Watchdog Library
-Summary(pl.UTF-8):	Biblioteka statyczna Parma Watchdog Library
-Group:		Development/Libraries
-Requires:	%{name}-pwl-devel = %{version}-%{release}
-
-%description pwl-static
-This package contains the static archive for the Parma Watchdog
-Library.
-
-%description pwl-static -l pl.UTF-8
-Ten pakiet zawiera bibliotekę statyczną Parma Watchdog Library.
-
-%package pwl-docs
-Summary:	Documentation for the Parma Watchdog Library
-Summary(pl.UTF-8):	Dokumentacja biblioteki Parma Watchdog Library
-Group:		Documentation
-Requires:	%{name}-pwl = %{version}-%{release}
-
-%description pwl-docs
-This package contains all the documentations required by programmers
-using the Parma Watchdog Library (PWL). Install this package if you
-want to program with the PWL.
-
-%description pwl-docs -l pl.UTF-8
-Ten pakiet zawiera całą dokumentację potrzebną programistom
-korzystającym z biblioteki Parma Watchdog Library (PWL). Warto
-zainstalować ten pakiet, aby programować z użyciem PWL.
 
 %package utils
 Summary:	Utilities using the Parma Polyhedra Library
@@ -377,8 +324,6 @@ install -d $RPM_BUILD_ROOT%{_libdir}/%{name}
 	INSTALL="%{__install} -p" \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
-
 %if %{with java}
 # Install the Javadocs for ppl-java.
 install -d $RPM_BUILD_ROOT%{_javadocdir}
@@ -387,28 +332,32 @@ mv \
 	$RPM_BUILD_ROOT%{_javadocdir}/%{name}-java
 %endif
 
+%if %{with gprolog} || %{with swi_pl} || %{with yap_pl}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
+%endif
+
+# common licenses
+%{__rm} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{COPYING,fdl.*,gpl.*}
+# packaged in .pdf format
+%{__rm} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/ppl-user*-%{version}.ps.gz
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%post	pwl -p /sbin/ldconfig
-%postun	pwl -p /sbin/ldconfig
-
 %files
 %defattr(644,root,root,755)
 %dir %{_docdir}/%{name}-%{version}
 %doc %{_docdir}/%{name}-%{version}/BUGS
-%doc %{_docdir}/%{name}-%{version}/COPYING
 %doc %{_docdir}/%{name}-%{version}/CREDITS
 %doc %{_docdir}/%{name}-%{version}/NEWS
 %doc %{_docdir}/%{name}-%{version}/README
 %doc %{_docdir}/%{name}-%{version}/README.configure
 %doc %{_docdir}/%{name}-%{version}/TODO
-%doc %{_docdir}/%{name}-%{version}/gpl.txt
 %attr(755,root,root) %{_libdir}/libppl.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libppl.so.9
+%attr(755,root,root) %ghost %{_libdir}/libppl.so.10
 %attr(755,root,root) %{_libdir}/libppl_c.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libppl_c.so.4
 %dir %{_libdir}/%{name}
@@ -418,6 +367,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/ppl-config
 %attr(755,root,root) %{_libdir}/libppl.so
 %attr(755,root,root) %{_libdir}/libppl_c.so
+%{_libdir}/libppl.la
+%{_libdir}/libppl_c.la
 %{_includedir}/ppl*.hh
 %{_includedir}/ppl_c*.h
 %{_mandir}/man1/ppl-config.1*
@@ -444,55 +395,15 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc %{_docdir}/%{name}-%{version}/ChangeLog*
 %doc %{_docdir}/%{name}-%{version}/README.doc
-%doc %{_docdir}/%{name}-%{version}/fdl.*
-%doc %{_docdir}/%{name}-%{version}/gpl.pdf
-%doc %{_docdir}/%{name}-%{version}/gpl.ps.gz
 %doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}.pdf
-%doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}.ps.gz
-
 %doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}.pdf
-%doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}.ps.gz
 
 %if %{with gprolog} || %{with swi_pl} || %{with yap_pl}
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}.pdf
-%doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}.ps.gz
 %endif
-
-%files pwl
-%defattr(644,root,root,755)
-#%dir %{_docdir}/%{name}-%{version}/pwl
-#%doc %{_docdir}/%{name}-%{version}/pwl/BUGS
-#%doc %{_docdir}/%{name}-%{version}/pwl/COPYING
-#%doc %{_docdir}/%{name}-%{version}/pwl/CREDITS
-#%doc %{_docdir}/%{name}-%{version}/pwl/NEWS
-#%doc %{_docdir}/%{name}-%{version}/pwl/README
-#%doc %{_docdir}/%{name}-%{version}/pwl/gpl.txt
-%attr(755,root,root) %{_libdir}/libpwl.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libpwl.so.5
-
-%files pwl-devel
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libpwl.so
-%doc Watchdog/doc/README.doc
-%{_includedir}/pwl*.hh
-
-%files pwl-static
-%defattr(644,root,root,755)
-%{_libdir}/libpwl.a
-
-%files pwl-docs
-%defattr(644,root,root,755)
-#%doc %{_docdir}/%{name}-%{version}/pwl/ChangeLog*
-#%doc %{_docdir}/%{name}-%{version}/pwl/README.doc
-#%doc %{_docdir}/%{name}-%{version}/pwl/fdl.*
-#%doc %{_docdir}/%{name}-%{version}/pwl/gpl.ps.gz
-#%doc %{_docdir}/%{name}-%{version}/pwl/gpl.pdf
-%doc %{_docdir}/%{name}-%{version}/pwl-user-*-html/
-%doc %{_docdir}/%{name}-%{version}/pwl-user-*.pdf
-%doc %{_docdir}/%{name}-%{version}/pwl-user-*.ps.gz
 
 %if %{with gprolog}
 %files gprolog
