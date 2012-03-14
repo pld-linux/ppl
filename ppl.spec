@@ -5,7 +5,7 @@
 # - proprietary: cicstus prolog
 #
 # Conditional build:
-%bcond_with	java	# java bindings
+%bcond_without	java	# java bindings
 %bcond_with	ocaml	# ocaml bindings
 %bcond_with	gprolog	# gprolog interface
 %bcond_with	swi_pl	# swi_prolog interface
@@ -310,10 +310,9 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 %endif
 
 %configure \
-	--enable-interfaces="c++ c %{?with_gprolog:gnu_prolog} %{?with_swi_pl:swi_prolog} %{?with_yap_pl:yap_prolog} %{?with_java:java}" \
-	--enable-shared \
 	--docdir=%{_docdir}/%{name}-%{version} \
 	--disable-rpath \
+	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swi_pl:swi_prolog} %{?with_yap_pl:yap_prolog}"
 
 %{__make}
 
@@ -332,7 +331,7 @@ mv \
 	$RPM_BUILD_ROOT%{_javadocdir}/%{name}-java
 %endif
 
-%if %{with gprolog} || %{with swi_pl} || %{with yap_pl}
+%if %{with java} || %{with gprolog} || %{with swi_pl} || %{with yap_pl}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
 %endif
 
@@ -449,7 +448,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n ocaml-ppl-devel
 %defattr(644,root,root,755)
-%doc %{_docdir}/%{name}-%{version}/ppl-user-ocaml-interface-%{version}.ps.gz
 %doc %{_docdir}/%{name}-%{version}/ppl-user-ocaml-interface-%{version}.pdf
 %doc %{_docdir}/%{name}-%{version}/ppl-user-ocaml-interface-%{version}-html/
 %{_libdir}/%{name}/libppl_ocaml.a
@@ -466,6 +464,5 @@ rm -rf $RPM_BUILD_ROOT
 %files -n java-ppl-javadoc
 %defattr(644,root,root,755)
 %doc %{_docdir}/%{name}-%{version}/ppl-user-java-interface-%{version}.pdf
-%doc %{_docdir}/%{name}-%{version}/ppl-user-java-interface-%{version}.ps.gz
 %{_javadocdir}/%{name}-java
 %endif
