@@ -1,4 +1,5 @@
 # TODO
+# - build ocaml binding as shared module
 # - help naming the subpackages properly
 # - fix mess with docs packaging
 # - ciao_prolog, xsb prolog
@@ -6,7 +7,7 @@
 #
 # Conditional build:
 %bcond_without	java	# java bindings
-%bcond_with	ocaml	# ocaml bindings
+%bcond_without	ocaml	# ocaml bindings
 %bcond_with	gprolog	# gprolog interface
 %bcond_with	swi_pl	# swi_prolog interface
 %bcond_with	yap_pl	# yap_prolog interface
@@ -48,6 +49,7 @@ BuildRequires:	gprolog >= 1.2.19
 %endif
 %if %{with ocaml}
 BuildRequires:	ocaml >= 3.09
+BuildRequires:	ocaml-gmp-devel
 %endif
 %if %{with java}
 BuildRequires:	jdk
@@ -239,6 +241,7 @@ Summary:	The OCaml interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Interfejs OCamla do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	ocaml-gmp
 
 %description -n ocaml-ppl
 This package adds Objective Caml (OCaml) support to the Parma
@@ -311,7 +314,6 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
-	--disable-rpath \
 	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swi_pl:swi_prolog} %{?with_yap_pl:yap_prolog}"
 
 %{__make}
@@ -442,7 +444,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ocaml-ppl
 %defattr(644,root,root,755)
 %doc interfaces/OCaml/README.ocaml
+%{_libdir}/%{name}/ppl_ocaml.a
 %{_libdir}/%{name}/ppl_ocaml.cma
+%{_libdir}/%{name}/ppl_ocaml.cmxa
 %{_libdir}/%{name}/ppl_ocaml.cmi
 %{_libdir}/%{name}/ppl_ocaml_globals.cmi
 
