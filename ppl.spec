@@ -1,5 +1,6 @@
 # TODO
 # - build ocaml binding as shared module
+# - verify ocaml,gprolog files locations
 # - help naming the subpackages properly
 # - fix mess with docs packaging
 # - ciao_prolog, xsb prolog
@@ -8,13 +9,12 @@
 # Conditional build:
 %bcond_without	java	# java bindings
 %bcond_without	ocaml	# ocaml bindings
-%bcond_with	gprolog	# gprolog interface
+%bcond_without	gprolog	# gprolog interface
 %bcond_with	swi_pl	# swi_prolog interface
 %bcond_with	yap_pl	# yap_prolog interface
 
-%ifarch ia64 ppc64 s390 s390x sparc64 sparcv9 %{arm}
-# The `gprolog' package is not available on ppc64:
-# the GNU Prolog interface must thus be disabled for that architecture.
+%ifnarch %{ix86} %{x8664} alpha ppc64
+# GNU Prolog not available
 %undefine	with_gprolog
 %endif
 
@@ -153,35 +153,34 @@ program ppl_lcdd do numerowania wierzchołków i ścian wielościanów
 wypukłych oraz program do rozwiązywania parametrycznych
 całkowitoliczbowych problemów programowania liniowego ppl_pips.
 
-%package gprolog
+%package -n gprolog-ppl
 Summary:	The GNU Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Interfejs GNU Prologa do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	%{name}-pwl = %{version}-%{release}
 Requires:	gprolog >= 1.2.19
 
-%description gprolog
+%description -n gprolog-ppl
 This package adds GNU Prolog support to the Parma Polyhedra Library
 (PPL). Install this package if you want to use the library in GNU
 Prolog programs.
 
-%description gprolog -l pl.UTF-8
+%description -n gprolog-ppl -l pl.UTF-8
 Ten pakiet dodaje obsługę GNU Prologa do biblioteki Parma Polyhedra
 Library (PPL). Należy go zainstalować, aby móc korzystać z biblioteki
 w GNU Prologu.
 
-%package gprolog-static
+%package -n gprolog-ppl-static
 Summary:	The static archive for the GNU Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Statyczna biblioteka interfejsu GNU Prologa do biblioteki PPL
 Group:		Development/Libraries
-Requires:	%{name}-gprolog = %{version}-%{release}
+Requires:	gprolog-ppl = %{version}-%{release}
 
-%description gprolog-static
+%description -n gprolog-ppl-static
 This package contains the static archive for the GNU Prolog interface
 of the Parma Polyhedra Library.
 
-%description gprolog-static -l pl.UTF-8
+%description -n gprolog-ppl-static -l pl.UTF-8
 Statyczna biblioteka interfejsu GNU Prologa do biblioteki Parma
 Polyhedra Library.
 
@@ -190,7 +189,6 @@ Summary:	The SWI-Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Interfejs SWI-Prologa do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	%{name}-pwl = %{version}-%{release}
 Requires:	pl >= 5.10.2-3
 
 %description swiprolog
@@ -222,7 +220,6 @@ Summary:	The YAP Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Interfejs YAP Prologa do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	%{name}-pwl = %{version}-%{release}
 Requires:	yap >= 5.1.1
 Obsoletes:	ppl-yap-static
 
@@ -320,7 +317,9 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_libdir}/%{name}
+# let these dirs exist even if no bindings are build
+install -d $RPM_BUILD_ROOT{%{_libdir}/%{name},%{_datadir}/%{name}}
+
 %{__make} install \
 	INSTALL="%{__install} -p" \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -362,6 +361,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libppl_c.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libppl_c.so.4
 %dir %{_libdir}/%{name}
+%dir %{_datadir}/%{name}
 
 %files devel
 %defattr(644,root,root,755)
@@ -407,14 +407,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if %{with gprolog}
-%files gprolog
+%files -n gprolog-ppl
 %defattr(644,root,root,755)
 %doc interfaces/Prolog/GNU/README.gprolog
 %attr(755,root,root) %{_bindir}/ppl_gprolog
-%{_libdir}/%{name}/ppl_gprolog.pl
 %attr(755,root,root) %{_libdir}/%{name}/libppl_gprolog.so
+%{_datadir}/%{name}/ppl_gprolog.pl
 
-%files gprolog-static
+%files -n gprolog-ppl-static
 %defattr(644,root,root,755)
 %{_libdir}/%{name}/libppl_gprolog.a
 %endif
