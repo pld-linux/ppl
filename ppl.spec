@@ -1,16 +1,16 @@
 # TODO
 # - build ocaml binding as shared module
-# - verify ocaml,gprolog files locations
+# - verify ocaml,gprolog,swipl files locations
 # - help naming the subpackages properly
 # - fix mess with docs packaging
 # - ciao_prolog, xsb prolog
 # - proprietary: cicstus prolog
 #
 # Conditional build:
-%bcond_without	java	# java bindings
-%bcond_without	ocaml	# ocaml bindings
-%bcond_without	gprolog	# gprolog interface
-%bcond_with	swi_pl	# swi_prolog interface
+%bcond_without	java	# Java bindings
+%bcond_without	ocaml	# OCaml bindings
+%bcond_without	gprolog	# GNU Pprolog interface
+%bcond_without	swipl	# SWI-Prolog interface
 %bcond_with	yap_pl	# yap_prolog interface
 
 %ifnarch %{ix86} %{x8664} alpha ppc64
@@ -39,10 +39,8 @@ BuildRequires:	xz
 %if %{with yap_pl}
 BuildRequires:	yap-devel >= 5.1.1
 %endif
-%if %{with swi_pl}
+%if %{with swipl}
 BuildRequires:	pl >= 5.10.2-3
-BuildRequires:	pl-devel >= 5.10.2-3
-BuildRequires:	pl-static >= 5.10.2-3
 %endif
 %if %{with gprolog}
 BuildRequires:	gprolog >= 1.2.19
@@ -159,6 +157,7 @@ Summary(pl.UTF-8):	Interfejs GNU Prologa do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	gprolog >= 1.2.19
+Obsoletes:	ppl-gprolog
 
 %description -n gprolog-ppl
 This package adds GNU Prolog support to the Parma Polyhedra Library
@@ -175,6 +174,7 @@ Summary:	The static archive for the GNU Prolog interface of the Parma Polyhedra 
 Summary(pl.UTF-8):	Statyczna biblioteka interfejsu GNU Prologa do biblioteki PPL
 Group:		Development/Libraries
 Requires:	gprolog-ppl = %{version}-%{release}
+Obsoletes:	ppl-gprolog-static
 
 %description -n gprolog-ppl-static
 This package contains the static archive for the GNU Prolog interface
@@ -184,34 +184,36 @@ of the Parma Polyhedra Library.
 Statyczna biblioteka interfejsu GNU Prologa do biblioteki Parma
 Polyhedra Library.
 
-%package swiprolog
+%package -n swipl-ppl
 Summary:	The SWI-Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Interfejs SWI-Prologa do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	pl >= 5.10.2-3
+Obsoletes:	ppl-swiprolog
 
-%description swiprolog
+%description -n swipl-ppl
 This package adds SWI-Prolog support to the Parma Polyhedra Library.
 Install this package if you want to use the library in SWI-Prolog
 programs.
 
-%description swiprolog -l pl.UTF-8
+%description -n swipl-ppl -l pl.UTF-8
 Ten pakiet dodaje obsługę SWI-Prologa do biblioteki Parma Polyhedra
 Library (PPL). Należy go zainstalować, aby móc korzystać z biblioteki
 w SWI-Prologu.
 
-%package swiprolog-static
+%package -n swipl-ppl-static
 Summary:	The static archive for the SWI-Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Statyczna biblioteka interfejsu SWI-Prologa do biblioteki PPL
 Group:		Development/Libraries
 Requires:	%{name}-swiprolog = %{version}-%{release}
+Obsoletes:	ppl-swiprolog-static
 
-%description swiprolog-static
+%description -n swipl-ppl-static
 This package contains the static archive for the SWI-Prolog interface
 of the Parma Polyhedra Library.
 
-%description swiprolog-static -l pl.UTF-8
+%description -n swipl-ppl-static -l pl.UTF-8
 Statyczna biblioteka interfejsu SWI-Prologa do biblioteki Parma
 Polyhedra Library.
 
@@ -302,7 +304,7 @@ CPPFLAGS="-I%{_includedir}/glpk"
 %if %{with gprolog}
 CPPFLAGS="$CPPFLAGS -I%{_libdir}/gprolog-`gprolog --version 2>&1 | head -1 | sed -e "s/.* \([^ ]*\)$/\1/g"`/include"
 %endif
-%if %{with swi_pl}
+%if %{with swipl}
 CPPFLAGS="$CPPFLAGS -I`swipl -dump-runtime-variables | grep PLBASE= | sed 's/PLBASE="\(.*\)";/\1/'`/include"
 %endif
 %if %{with yap_pl}
@@ -311,7 +313,7 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
-	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swi_pl:swi_prolog} %{?with_yap_pl:yap_prolog}"
+	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_yap_pl:yap_prolog}"
 
 %{__make}
 
@@ -332,7 +334,7 @@ mv \
 	$RPM_BUILD_ROOT%{_javadocdir}/%{name}-java
 %endif
 
-%if %{with java} || %{with gprolog} || %{with swi_pl} || %{with yap_pl}
+%if %{with java} || %{with gprolog} || %{with swipl} || %{with yap_pl}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
 %endif
 
@@ -401,7 +403,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}.pdf
 %doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}.pdf
 
-%if %{with gprolog} || %{with swi_pl} || %{with yap_pl}
+%if %{with gprolog} || %{with swipl} || %{with yap_pl}
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}.pdf
 %endif
@@ -419,15 +421,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libppl_gprolog.a
 %endif
 
-%if %{with swi_pl}
-%files swiprolog
+%if %{with swipl}
+%files -n swipl-ppl
 %defattr(644,root,root,755)
 %doc interfaces/Prolog/SWI/README.swiprolog
 %attr(755,root,root) %{_bindir}/ppl_pl
 %attr(755,root,root) %{_libdir}/%{name}/libppl_swiprolog.so
-%{_libdir}/%{name}/ppl_swiprolog.pl
+%{_datadir}/%{name}/ppl_swiprolog.pl
 
-%files swiprolog-static
+%files -n swipl-ppl-static
 %defattr(644,root,root,755)
 %{_libdir}/%{name}/libppl_swiprolog.a
 %endif
