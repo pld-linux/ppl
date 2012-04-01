@@ -1,6 +1,6 @@
 # TODO
 # - build ocaml binding as shared module
-# - verify ocaml,gprolog,swipl files locations
+# - verify ocaml,gprolog,swipl,Yap files locations
 # - help naming the subpackages properly
 # - fix mess with docs packaging
 # - ciao_prolog, xsb prolog
@@ -11,7 +11,7 @@
 %bcond_without	ocaml	# OCaml bindings
 %bcond_without	gprolog	# GNU Pprolog interface
 %bcond_without	swipl	# SWI-Prolog interface
-%bcond_with	yap_pl	# yap_prolog interface
+%bcond_without	yap	# Yap prolog interface
 
 %ifnarch %{ix86} %{x8664} alpha ppc64
 # GNU Prolog not available
@@ -28,6 +28,10 @@ Group:		Libraries
 Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.xz
 # Source0-md5:	7615f217b66b4ab4783c20c9fc516ff4
 URL:		http://www.cs.unipr.it/ppl/
+%if %{with yap}
+BuildRequires:	Yap >= 5.1.1
+BuildRequires:	Yap-static >= 5.1.1
+%endif
 BuildRequires:	glpk-devel >= 4.13
 BuildRequires:	gmp-c++-devel >= 4.1.3
 BuildRequires:	gmp-devel >= 4.1.3
@@ -36,9 +40,6 @@ BuildRequires:	m4 >= 1.4.8
 BuildRequires:	perl-base
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
-%if %{with yap_pl}
-BuildRequires:	yap-devel >= 5.1.1
-%endif
 %if %{with swipl}
 BuildRequires:	pl >= 5.10.2-3
 %endif
@@ -217,20 +218,21 @@ of the Parma Polyhedra Library.
 Statyczna biblioteka interfejsu SWI-Prologa do biblioteki Parma
 Polyhedra Library.
 
-%package yap
+%package -n Yap-ppl
 Summary:	The YAP Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Interfejs YAP Prologa do biblioteki Parma Polyhedra Library
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	yap >= 5.1.1
+Requires:	Yap >= 5.1.1
+Obsoletes:	ppl-yap
 Obsoletes:	ppl-yap-static
 
-%description yap
+%description -n Yap-ppl
 This package adds YAP Prolog support to the Parma Polyhedra Library
 (PPL). Install this package if you want to use the library in YAP
 Prolog programs.
 
-%description yap -l pl.UTF-8
+%description -n Yap-ppl -l pl.UTF-8
 Ten pakiet dodaje obsługę YAP Prologa do biblioteki Parma Polyhedra
 Library (PPL). Należy go zainstalować, aby móc korzystać z biblioteki
 w YAP Prologu.
@@ -307,13 +309,13 @@ CPPFLAGS="$CPPFLAGS -I%{_libdir}/gprolog-`gprolog --version 2>&1 | head -1 | sed
 %if %{with swipl}
 CPPFLAGS="$CPPFLAGS -I`swipl -dump-runtime-variables | grep PLBASE= | sed 's/PLBASE="\(.*\)";/\1/'`/include"
 %endif
-%if %{with yap_pl}
+%if %{with yap}
 CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 %endif
 
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
-	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_yap_pl:yap_prolog}"
+	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_yap:yap_prolog}"
 
 %{__make}
 
@@ -334,7 +336,7 @@ mv \
 	$RPM_BUILD_ROOT%{_javadocdir}/%{name}-java
 %endif
 
-%if %{with java} || %{with gprolog} || %{with swipl} || %{with yap_pl}
+%if %{with java} || %{with gprolog} || %{with swipl} || %{with yap}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
 %endif
 
@@ -403,7 +405,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}.pdf
 %doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}.pdf
 
-%if %{with gprolog} || %{with swipl} || %{with yap_pl}
+%if %{with gprolog} || %{with swipl} || %{with yap}
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}.pdf
 %endif
@@ -434,12 +436,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libppl_swiprolog.a
 %endif
 
-%if %{with yap_pl}
-%files yap
+%if %{with yap}
+%files -n Yap-ppl
 %defattr(644,root,root,755)
 %doc interfaces/Prolog/YAP/README.yap
-%{_libdir}/%{name}/ppl_yap.pl
 %attr(755,root,root) %{_libdir}/%{name}/ppl_yap.so
+%{_datadir}/%{name}/ppl_yap.pl
 %endif
 
 %if %{with ocaml}
