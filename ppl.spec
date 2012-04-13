@@ -1,6 +1,6 @@
 # TODO
 # - build ocaml binding as shared module
-# - verify ocaml,gprolog,swipl,Yap files locations
+# - verify ocaml,gprolog,swipl,Yap,Ciao files locations
 # - help naming the subpackages properly
 # - fix mess with docs packaging
 # - ciao_prolog, xsb prolog
@@ -9,6 +9,7 @@
 # Conditional build:
 %bcond_without	java	# Java bindings
 %bcond_without	ocaml	# OCaml bindings
+%bcond_without	ciao	# Ciao Prolog interface
 %bcond_without	gprolog	# GNU Pprolog interface
 %bcond_without	swipl	# SWI-Prolog interface
 %bcond_without	yap	# Yap prolog interface
@@ -27,15 +28,22 @@ License:	GPL v3+
 Group:		Libraries
 Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.xz
 # Source0-md5:	7615f217b66b4ab4783c20c9fc516ff4
+Patch0:		%{name}-ciao.patch
 URL:		http://www.cs.unipr.it/ppl/
+%if %{with ciao}
+BuildRequires:	CiaoDE >= 1.14
+%endif
 %if %{with yap}
 BuildRequires:	Yap >= 5.1.1
 BuildRequires:	Yap-static >= 5.1.1
 %endif
+BuildRequires:	autoconf >= 2.61
+BuildRequires:	automake >= 1:1.11
 BuildRequires:	glpk-devel >= 4.13
 BuildRequires:	gmp-c++-devel >= 4.1.3
 BuildRequires:	gmp-devel >= 4.1.3
 BuildRequires:	libstdc++-devel
+BuildRequires:	libtool >= 2:2.0
 BuildRequires:	m4 >= 1.4.8
 BuildRequires:	perl-base
 BuildRequires:	tar >= 1:1.22
@@ -151,6 +159,38 @@ całkowitoliczbowych problemów programowania liniowego ppl_lpsol,
 program ppl_lcdd do numerowania wierzchołków i ścian wielościanów
 wypukłych oraz program do rozwiązywania parametrycznych
 całkowitoliczbowych problemów programowania liniowego ppl_pips.
+
+%package -n Ciao-ppl
+Summary:	The Ciao Prolog interface of the Parma Polyhedra Library
+Summary(pl.UTF-8):	Interfejs Ciao Prologa do biblioteki Parma Polyhedra Library
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	CiaoDE >= 1.14
+Obsoletes:	ppl-gprolog
+
+%description -n Ciao-ppl
+This package adds Ciao Prolog support to the Parma Polyhedra Library
+(PPL). Install this package if you want to use the library in Ciao
+Prolog programs.
+
+%description -n Ciao-ppl -l pl.UTF-8
+Ten pakiet dodaje obsługę Ciao Prologa do biblioteki Parma Polyhedra
+Library (PPL). Należy go zainstalować, aby móc korzystać z biblioteki
+w Ciao Prologu.
+
+%package -n Ciao-ppl-static
+Summary:	The static archive for the Ciao Prolog interface of the Parma Polyhedra Library
+Summary(pl.UTF-8):	Statyczna biblioteka interfejsu Ciao Prologa do biblioteki PPL
+Group:		Development/Libraries
+Requires:	Ciao-ppl = %{version}-%{release}
+
+%description -n Ciao-ppl-static
+This package contains the static archive for the Ciao Prolog interface
+of the Parma Polyhedra Library.
+
+%description -n Ciao-ppl-static -l pl.UTF-8
+Statyczna biblioteka interfejsu Ciao Prologa do biblioteki Parma
+Polyhedra Library.
 
 %package -n gprolog-ppl
 Summary:	The GNU Prolog interface of the Parma Polyhedra Library
@@ -300,8 +340,14 @@ Parma Polyhedra Library.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
+%{__libtoolize}
+%{__aclocal} -I m4
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 CPPFLAGS="-I%{_includedir}/glpk"
 %if %{with gprolog}
 CPPFLAGS="$CPPFLAGS -I%{_libdir}/gprolog-`gprolog --version 2>&1 | head -1 | sed -e "s/.* \([^ ]*\)$/\1/g"`/include"
@@ -315,7 +361,7 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
-	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_yap:yap_prolog}"
+	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_ciao:ciao_prolog} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_yap:yap_prolog}"
 
 %{__make}
 
@@ -336,7 +382,7 @@ mv \
 	$RPM_BUILD_ROOT%{_javadocdir}/%{name}-java
 %endif
 
-%if %{with java} || %{with gprolog} || %{with swipl} || %{with yap}
+%if %{with java} || %{with ciao} || %{with gprolog} || %{with swipl} || %{with yap}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
 %endif
 
@@ -405,9 +451,21 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}.pdf
 %doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}.pdf
 
-%if %{with gprolog} || %{with swipl} || %{with yap}
+%if %{with ciao} || %{with gprolog} || %{with swipl} || %{with yap}
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}.pdf
+%endif
+
+%if %{with ciao}
+%files -n Ciao-ppl
+%defattr(644,root,root,755)
+%doc interfaces/Prolog/Ciao/README.ciao
+%attr(755,root,root) %{_libdir}/%{name}/libppl_ciao.so
+%{_datadir}/%{name}/ppl_ciao.po
+
+%files -n Ciao-ppl-static
+%defattr(644,root,root,755)
+%{_libdir}/%{name}/libppl_ciao.a
 %endif
 
 %if %{with gprolog}
