@@ -3,7 +3,7 @@
 # - verify ocaml,gprolog,swipl,Yap,Ciao files locations
 # - help naming the subpackages properly
 # - fix mess with docs packaging
-# - ciao_prolog, xsb prolog
+# - finish xsb prolog
 # - proprietary: cicstus prolog
 #
 # Conditional build:
@@ -13,6 +13,7 @@
 %bcond_without	gprolog	# GNU Pprolog interface
 %bcond_without	swipl	# SWI-Prolog interface
 %bcond_without	yap	# Yap prolog interface
+%bcond_with	xsb	# XSB prolog interface
 
 %ifnarch %{ix86} %{x8664} alpha ppc64
 # GNU Prolog not available
@@ -30,6 +31,9 @@ Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.ta
 # Source0-md5:	7615f217b66b4ab4783c20c9fc516ff4
 Patch0:		%{name}-ciao.patch
 URL:		http://www.cs.unipr.it/ppl/
+%if %{with xsb}
+BuildRequires:	XSB
+%endif
 %if %{with ciao}
 BuildRequires:	CiaoDE >= 1.14
 %endif
@@ -190,6 +194,38 @@ of the Parma Polyhedra Library.
 
 %description -n Ciao-ppl-static -l pl.UTF-8
 Statyczna biblioteka interfejsu Ciao Prologa do biblioteki Parma
+Polyhedra Library.
+
+%package -n XSB-ppl
+Summary:	The XSB Prolog interface of the Parma Polyhedra Library
+Summary(pl.UTF-8):	Interfejs XSB Prologa do biblioteki Parma Polyhedra Library
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	XSBDE >= 1.14
+Obsoletes:	ppl-gprolog
+
+%description -n XSB-ppl
+This package adds XSB Prolog support to the Parma Polyhedra Library
+(PPL). Install this package if you want to use the library in XSB
+Prolog programs.
+
+%description -n XSB-ppl -l pl.UTF-8
+Ten pakiet dodaje obsługę XSB Prologa do biblioteki Parma Polyhedra
+Library (PPL). Należy go zainstalować, aby móc korzystać z biblioteki
+w XSB Prologu.
+
+%package -n XSB-ppl-static
+Summary:	The static archive for the XSB Prolog interface of the Parma Polyhedra Library
+Summary(pl.UTF-8):	Statyczna biblioteka interfejsu XSB Prologa do biblioteki PPL
+Group:		Development/Libraries
+Requires:	XSB-ppl = %{version}-%{release}
+
+%description -n XSB-ppl-static
+This package contains the static archive for the XSB Prolog interface
+of the Parma Polyhedra Library.
+
+%description -n XSB-ppl-static -l pl.UTF-8
+Statyczna biblioteka interfejsu XSB Prologa do biblioteki Parma
 Polyhedra Library.
 
 %package -n gprolog-ppl
@@ -361,7 +397,7 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
-	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_ciao:ciao_prolog} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_yap:yap_prolog}"
+	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_ciao:ciao_prolog} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_xsb:xsb_prolog} %{?with_yap:yap_prolog}"
 
 %{__make}
 
@@ -382,7 +418,7 @@ mv \
 	$RPM_BUILD_ROOT%{_javadocdir}/%{name}-java
 %endif
 
-%if %{with java} || %{with ciao} || %{with gprolog} || %{with swipl} || %{with yap}
+%if %{with java} || %{with ciao} || %{with gprolog} || %{with swipl} || %{with xsb} || %{with yap}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
 %endif
 
@@ -451,9 +487,20 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}/ppl-user-c-interface-%{version}.pdf
 %doc %{_docdir}/%{name}-%{version}/ppl-user-%{version}.pdf
 
-%if %{with ciao} || %{with gprolog} || %{with swipl} || %{with yap}
+%if %{with ciao} || %{with gprolog} || %{with swipl} || %{with xsb} || %{with yap}
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}-html/
 %doc %{_docdir}/%{name}-%{version}/ppl-user-prolog-interface-%{version}.pdf
+%endif
+
+%if %{with xsb}
+%files -n XSB-ppl
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/%{name}/libppl_xsb.so
+%{_datadir}/%{name}/ppl_xsb.xwam
+
+%files -n XSB-ppl-static
+%defattr(644,root,root,755)
+%{_libdir}/%{name}/libppl_xsb.a
 %endif
 
 %if %{with ciao}
