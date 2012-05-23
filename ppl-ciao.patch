@@ -1,0 +1,11 @@
+--- ppl-0.12/m4/ac_check_ciao.m4.orig	2012-02-27 17:30:23.000000000 +0100
++++ ppl-0.12/m4/ac_check_ciao.m4	2012-04-11 21:20:26.736330240 +0200
+@@ -41,7 +41,7 @@
+   } || exit $?
+   cat >$tmp/print_include_dir.pl <<_CIAO_PRINT_INCLUDE_DIR_EOF
+ main(_) :-
+-    ciaolibdir(Lib_Dir),
++    ciao_lib_dir(Lib_Dir),
+     get_os(Os),
+     get_arch(Arch),
+     format("~p/include/~p~p", [[Lib_Dir, Os, Arch]]).
