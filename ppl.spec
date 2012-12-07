@@ -9,7 +9,7 @@
 # Conditional build:
 %bcond_without	java	# Java bindings
 %bcond_without	ocaml	# OCaml bindings
-%bcond_without	ciao	# Ciao Prolog interface
+%bcond_with	ciao	# Ciao Prolog interface
 %bcond_without	gprolog	# GNU Pprolog interface
 %bcond_without	swipl	# SWI-Prolog interface
 %bcond_without	yap	# Yap prolog interface
