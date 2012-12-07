@@ -283,7 +283,7 @@ w SWI-Prologu.
 Summary:	The static archive for the SWI-Prolog interface of the Parma Polyhedra Library
 Summary(pl.UTF-8):	Statyczna biblioteka interfejsu SWI-Prologa do biblioteki PPL
 Group:		Development/Libraries
-Requires:	%{name}-swiprolog = %{version}-%{release}
+Requires:	swipl-ppl = %{version}-%{release}
 Obsoletes:	ppl-swiprolog-static
 
 %description -n swipl-ppl-static
