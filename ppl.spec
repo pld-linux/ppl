@@ -397,6 +397,7 @@ CPPFLAGS="$CPPFLAGS -I%{_includedir}/Yap"
 
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
+	%{?with_java:--with-java=%{java_home}} \
 	--enable-interfaces="c++ c %{?with_ocaml:ocaml} %{?with_java:java} %{?with_ciao:ciao_prolog} %{?with_gprolog:gnu_prolog} %{?with_swipl:swi_prolog} %{?with_xsb:xsb_prolog} %{?with_yap:yap_prolog}"
 
 %{__make}
