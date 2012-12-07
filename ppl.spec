@@ -4,7 +4,7 @@
 # - help naming the subpackages properly
 # - fix mess with docs packaging
 # - finish xsb prolog
-# - proprietary: cicstus prolog
+# - proprietary: sicstus prolog
 #
 # Conditional build:
 %bcond_without	java	# Java bindings
