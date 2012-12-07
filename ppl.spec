@@ -12,7 +12,7 @@
 %bcond_with	ciao	# Ciao Prolog interface
 %bcond_without	gprolog	# GNU Pprolog interface
 %bcond_without	swipl	# SWI-Prolog interface
-%bcond_without	yap	# Yap prolog interface
+%bcond_with	yap	# Yap prolog interface
 %bcond_with	xsb	# XSB prolog interface
 
 %ifnarch %{ix86} %{x8664} alpha ppc64
