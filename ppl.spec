@@ -446,7 +446,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}/README.configure
 %doc %{_docdir}/%{name}-%{version}/TODO
 %attr(755,root,root) %{_libdir}/libppl.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libppl.so.10
+%attr(755,root,root) %ghost %{_libdir}/libppl.so.12
 %attr(755,root,root) %{_libdir}/libppl_c.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libppl_c.so.4
 %dir %{_libdir}/%{name}
@@ -535,7 +535,6 @@ rm -rf $RPM_BUILD_ROOT
 %files -n swipl-ppl
 %defattr(644,root,root,755)
 %doc interfaces/Prolog/SWI/README.swiprolog
-%attr(755,root,root) %{_bindir}/ppl_pl
 %attr(755,root,root) %{_libdir}/%{name}/libppl_swiprolog.so
 %{_datadir}/%{name}/ppl_swiprolog.pl
 
