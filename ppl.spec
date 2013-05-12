@@ -23,13 +23,14 @@
 Summary:	The Parma Polyhedra Library: a library of numerical abstractions
 Summary(pl.UTF-8):	Parma Polyhedra Library - biblioteka abstrakcji matematycznych
 Name:		ppl
-Version:	0.12
-Release:	3
+Version:	1.0
+Release:	1
 License:	GPL v3+
 Group:		Libraries
 Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	7615f217b66b4ab4783c20c9fc516ff4
+# Source0-md5:	e8caeb84cd858f64b36333c368891c7b
 Patch0:		%{name}-ciao.patch
+Patch1:		%{name}-gmp-5.1.0.patch
 URL:		http://www.cs.unipr.it/ppl/
 %if %{with xsb}
 BuildRequires:	XSB
@@ -377,6 +378,7 @@ Parma Polyhedra Library.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__libtoolize}
