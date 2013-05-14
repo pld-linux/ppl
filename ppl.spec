@@ -31,6 +31,7 @@ Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.ta
 # Source0-md5:	e8caeb84cd858f64b36333c368891c7b
 Patch0:		%{name}-ciao.patch
 Patch1:		%{name}-gmp-5.1.0.patch
+Patch2:		%{name}-glpk-api12.patch
 URL:		http://www.cs.unipr.it/ppl/
 %if %{with xsb}
 BuildRequires:	XSB
@@ -44,7 +45,7 @@ BuildRequires:	Yap-static >= 5.1.1
 %endif
 BuildRequires:	autoconf >= 2.61
 BuildRequires:	automake >= 1:1.11
-BuildRequires:	glpk-devel >= 4.13
+BuildRequires:	glpk-devel >= 4.38
 BuildRequires:	gmp-c++-devel >= 4.1.3
 BuildRequires:	gmp-devel >= 4.1.3
 BuildRequires:	libstdc++-devel
@@ -379,6 +380,7 @@ Parma Polyhedra Library.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %{__libtoolize}
