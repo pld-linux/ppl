@@ -7,17 +7,22 @@
 # - proprietary: sicstus prolog
 #
 # Conditional build:
-%bcond_without	java	# Java bindings
-%bcond_without	ocaml	# OCaml bindings
-%bcond_with	ciao	# Ciao Prolog interface
-%bcond_without	gprolog	# GNU Pprolog interface
-%bcond_without	swipl	# SWI-Prolog interface
-%bcond_with	yap	# Yap prolog interface
-%bcond_with	xsb	# XSB prolog interface
+%bcond_without	java		# Java bindings
+%bcond_without	ocaml		# OCaml bindings
+%bcond_without	ocaml_opt	# OCaml bindings native/opt
+%bcond_with	ciao		# Ciao Prolog interface
+%bcond_without	gprolog		# GNU Pprolog interface
+%bcond_without	swipl		# SWI-Prolog interface
+%bcond_with	yap		# Yap prolog interface
+%bcond_with	xsb		# XSB prolog interface
 
 %ifnarch %{ix86} %{x8664} alpha ppc64
 # GNU Prolog not available
 %undefine	with_gprolog
+%endif
+
+%ifarch x32
+%undefine	with_ocaml_opt
 %endif
 
 Summary:	The Parma Polyhedra Library: a library of numerical abstractions
@@ -557,9 +562,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ocaml-ppl
 %defattr(644,root,root,755)
 %doc interfaces/OCaml/README.ocaml
-%{_libdir}/%{name}/ppl_ocaml.a
+%{?with_ocaml_opt:%{_libdir}/%{name}/ppl_ocaml.a}
 %{_libdir}/%{name}/ppl_ocaml.cma
-%{_libdir}/%{name}/ppl_ocaml.cmxa
+%{?with_ocaml_opt:%{_libdir}/%{name}/ppl_ocaml.cmxa}
 %{_libdir}/%{name}/ppl_ocaml.cmi
 %{_libdir}/%{name}/ppl_ocaml_globals.cmi
 
