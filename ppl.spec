@@ -28,15 +28,13 @@
 Summary:	The Parma Polyhedra Library: a library of numerical abstractions
 Summary(pl.UTF-8):	Parma Polyhedra Library - biblioteka abstrakcji matematycznych
 Name:		ppl
-Version:	1.0
-Release:	6
+Version:	1.2
+Release:	1
 License:	GPL v3+
 Group:		Libraries
 Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	e8caeb84cd858f64b36333c368891c7b
+# Source0-md5:	e7bd12043d1064214f7a0107b6da3f17
 Patch0:		%{name}-ciao.patch
-Patch1:		%{name}-gmp-5.1.0.patch
-Patch2:		%{name}-glpk-api12.patch
 URL:		http://www.cs.unipr.it/ppl/
 %if %{with xsb}
 BuildRequires:	XSB
@@ -384,8 +382,6 @@ Parma Polyhedra Library.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 %{__libtoolize}
@@ -453,7 +449,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}/README.configure
 %doc %{_docdir}/%{name}-%{version}/TODO
 %attr(755,root,root) %{_libdir}/libppl.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libppl.so.12
+%attr(755,root,root) %ghost %{_libdir}/libppl.so.14
 %attr(755,root,root) %{_libdir}/libppl_c.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libppl_c.so.4
 %dir %{_libdir}/%{name}
