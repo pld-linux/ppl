@@ -8,7 +8,7 @@
 #
 # Conditional build:
 %bcond_without	java		# Java bindings
-%bcond_without	ocaml		# OCaml bindings
+%bcond_with	ocaml		# OCaml bindings
 %bcond_without	ocaml_opt	# OCaml bindings native/opt
 %bcond_with	ciao		# Ciao Prolog interface
 %bcond_without	gprolog		# GNU Pprolog interface
@@ -29,7 +29,7 @@ Summary:	The Parma Polyhedra Library: a library of numerical abstractions
 Summary(pl.UTF-8):	Parma Polyhedra Library - biblioteka abstrakcji matematycznych
 Name:		ppl
 Version:	1.2
-Release:	3
+Release:	4
 License:	GPL v3+
 Group:		Libraries
 Source0:	ftp://ftp.cs.unipr.it/pub/ppl/releases/%{version}/%{name}-%{version}.tar.xz
